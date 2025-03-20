@@ -1,3 +1,4 @@
+// service.js
 // This file encapsulates the business logic for interacting with the OpenAI API.
 // It provides functions for generating chat responses and digital invitations using advanced prompting techniques.
 
@@ -12,7 +13,7 @@ const openai = new OpenAI({
 /**
  * Generates a chat response using the OpenAI API.
  * @param {Array} messages - Array of message objects representing the conversation.
- * @returns {Promise<Object>} - The AI response, parsed as JSON if possible.
+ * @returns {Promise<Object>} - The AI response, either as plain text or parsed JSON if available.
  */
 async function getChatResponse(messages) {
   // Prepare messages by including the system prompt as the first message
@@ -21,7 +22,6 @@ async function getChatResponse(messages) {
     ...messages
   ];
 
-  // Log the action with clear context
   console.log('[/api/chat] Sending request to OpenAI with', formattedMessages.length, 'messages');
 
   const response = await openai.chat.completions.create({
@@ -33,14 +33,16 @@ async function getChatResponse(messages) {
 
   const aiResponseText = response.choices[0].message.content;
   
-  // Attempt to parse as JSON for structured responses
-  try {
-    const jsonResponse = JSON.parse(aiResponseText);
-    return jsonResponse;
-  } catch (parseError) {
-    // If parsing fails, return the raw text response
-    return { response: aiResponseText };
+  // Attempt to parse as JSON only if it appears to be JSON
+  if (aiResponseText.trim().startsWith('{') && aiResponseText.trim().endsWith('}')) {
+    try {
+      const jsonResponse = JSON.parse(aiResponseText);
+      return jsonResponse;
+    } catch (parseError) {
+      // If parsing fails, fall back to returning plain text
+    }
   }
+  return { response: aiResponseText };
 }
 
 /**
@@ -49,7 +51,6 @@ async function getChatResponse(messages) {
  * @returns {Promise<Object>} - Contains invitation text, generated image URL, and the DALL-E prompt.
  */
 async function generateInvitation(messages) {
-  // Build extraction prompt to obtain necessary details from the conversation
   const extractionPrompt = `
 From the following conversation, extract the birthday person's name, age (if mentioned), and the party theme (if mentioned).
 If the theme isn't explicitly stated, infer it from the context or respond with "None" if it cannot be determined.
@@ -80,7 +81,6 @@ Respond with a JSON object in the following format:
     extractedData = JSON.parse(extractionResponse.choices[0].message.content.replace(/```json|```/g, '').trim());
   } catch (parseError) {
     console.error('[/api/generate-invitation] Error parsing extraction response:', parseError);
-    // Try a second approach - find the JSON object between curly braces
     try {
       const regex = /{[\s\S]*}/;
       const match = extractionResponse.choices[0].message.content.match(regex);
@@ -97,7 +97,6 @@ Respond with a JSON object in the following format:
 
   const { name, age, theme } = extractedData;
 
-  // Generate invitation text based on extracted details
   const invitationPrompt = `
 Based on our conversation, create a beautiful birthday invitation text for ${name}'s ${age ? age + "th " : ""}birthday.
 The theme is: ${theme === "None" ? "a general birthday" : theme}.
@@ -117,7 +116,6 @@ Include placeholders like [DATE], [TIME], and [LOCATION] for the event details.
 
   const invitationText = textResponse.choices[0].message.content.trim();
 
-  // Construct a DALL-E prompt based on the theme and details
   let dallePrompt = `Create a beautiful digital birthday invitation for ${name}'s ${age ? age + "th " : ""}birthday with a ${theme === "None" ? "general birthday" : theme} theme. `;
 
   if (theme === "travel" || theme === "adventure") {
@@ -128,7 +126,6 @@ Include placeholders like [DATE], [TIME], and [LOCATION] for the event details.
     dallePrompt += "The design should be festive and celebratory with balloons, confetti, and decorative elements. No text.";
   }
 
-  // Generate an image using DALL-E
   const imageResponse = await openai.images.generate({
     model: "dall-e-3",
     prompt: dallePrompt,
@@ -139,7 +136,7 @@ Include placeholders like [DATE], [TIME], and [LOCATION] for the event details.
 
   return {
     invitationText,
-    imageUrl: imageResponse.data[0].url,
+    invitationImageURL: imageResponse.data[0].url,
     dallePrompt
   };
 }
@@ -148,3 +145,4 @@ module.exports = {
   getChatResponse,
   generateInvitation
 };
+

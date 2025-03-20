@@ -1,65 +1,62 @@
-import React, { useState } from 'react';
+// InputBar.js
+import React, { useState, useRef, useEffect } from 'react';
 
 function InputBar({ onSend, disabled, onStop }) {
   const [input, setInput] = useState('');
+  const textareaRef = useRef(null);
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      // Set minimum height to 70px and cap maximum height at 200px
+      const newHeight = Math.min(Math.max(textarea.scrollHeight, 70), 200);
+      textarea.style.height = `${newHeight}px`;
+    }
+  }, [input]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!input.trim() || disabled) return;
-    onSend({ type: 'text', content: input });
+    onSend({ content: input });
     setInput('');
   };
 
-  const handleStop = () => {
-    if (onStop) onStop();
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="flex w-full">
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        disabled={disabled}
-        className={`
-          flex-1 
-          px-3 py-2.5 
-          text-base 
-          rounded-l-md 
-          border 
-          border-r-0 
-          border-gray-300 
-          focus:border-blue-500 
-          focus:ring-1 
-          focus:ring-blue-500 
-          ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
-        `}
-        placeholder={disabled ? "AI is processing..." : "Type your message..."}
-      />
-      <button 
-        type={disabled ? "button" : "submit"}
-        onClick={disabled ? handleStop : undefined}
-        className={`
-          px-5 py-2.5 
-          text-base 
-          rounded-r-md 
-          text-white 
-          font-medium 
-          transition-colors 
-          duration-200 
-          ${disabled 
-            ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' 
-            : 'bg-green-500 hover:bg-green-600 focus:ring-green-500'}
-          focus:outline-none 
-          focus:ring-2 
-          focus:ring-opacity-50
-          ${disabled ? 'cursor-pointer' : 'cursor-pointer'}
-        `}
-      >
-        {disabled ? 'Stop' : 'Send'}
-      </button>
+    <form onSubmit={handleSubmit} className="w-full p-4 bg-gray-100 border-t">
+      <div className="relative">
+        <textarea
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          disabled={disabled}
+          rows={1}
+          style={{ resize: 'none' }}
+          className="w-full p-3 pr-12 border rounded-lg overflow-hidden focus:ring-2 focus:ring-blue-500"
+          placeholder={disabled ? "AI is processing..." : "Type your message..."}
+        />
+        <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ width: '80px' }}>
+          {disabled ? (
+            <button 
+              type="button"
+              onClick={onStop}
+              className="w-full bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+            >
+              Stop
+            </button>
+          ) : (
+            <button 
+              type="submit"
+              className="w-full bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+            >
+              Send
+            </button>
+          )}
+        </div>
+      </div>
     </form>
   );
 }
 
 export default InputBar;
+
