@@ -1,7 +1,11 @@
+// apiService.js
 // This file encapsulates all API calls to the PartyPilot backend.
 // It provides functions to send chat messages and fetch digital invitations.
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || ''; // Optional: if using a custom URL or proxy
+// Set the base URL for API calls.
+// The REACT_APP_API_BASE_URL environment variable can be used to override the default.
+// If not set, defaults to 'http://localhost:3001'.
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001';
 
 /**
  * Sends the current conversation to the chat endpoint and retrieves a response.
@@ -10,7 +14,7 @@ const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || ''; // Optional: if u
  */
 export async function sendChatMessage(messages) {
   try {
-    const response = await fetch('/api/chat', {
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages }),
@@ -32,7 +36,7 @@ export async function sendChatMessage(messages) {
  */
 export async function fetchInvitation(messages) {
   try {
-    const response = await fetch('/api/generate-invitation', {
+    const response = await fetch(`${API_BASE_URL}/api/generate-invitation`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages }),
