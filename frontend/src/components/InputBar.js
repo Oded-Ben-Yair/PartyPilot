@@ -13,15 +13,39 @@ function InputBar({ onSend }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ marginTop: '1rem', display: 'flex' }}>
+    <form onSubmit={handleSubmit} style={{ 
+      display: 'flex',
+      width: '100%' 
+    }}>
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        style={{ flex: 1, padding: '8px' }}
+        style={{ 
+          flex: '1', 
+          padding: '10px 12px',
+          fontSize: '1rem',
+          borderRadius: '4px 0 0 4px',
+          border: '1px solid #ccc',
+          borderRight: 'none',
+          outline: 'none'
+        }}
         placeholder="Type your message..."
       />
-      <button type="submit" style={{ padding: '8px 16px' }}>Send</button>
+      <button 
+        type="submit" 
+        style={{ 
+          padding: '10px 20px',
+          backgroundColor: '#4CAF50',
+          color: 'white',
+          border: 'none',
+          borderRadius: '0 4px 4px 0',
+          fontSize: '1rem',
+          cursor: 'pointer'
+        }}
+      >
+        Send
+      </button>
     </form>
   );
 }

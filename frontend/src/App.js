@@ -8,10 +8,10 @@ function App() {
       <header className="App-header">
         <h1>PartyPilot</h1>
       </header>
-      <main>
+      <main className="App-main">
         <PlannerChat />
       </main>
-      <footer>
+      <footer className="App-footer">
         <p>Powered by AI</p>
       </footer>
     </div>
