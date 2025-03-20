@@ -6,25 +6,23 @@ import InvitationMessage from './InvitationMessage';
 import { processText } from '../utils/processText';
 
 function ChatMessage({ message }) {
+  // Handle invitation messages
+  if (message.type === 'invitation') {
+    return <InvitationMessage invitation={message.content} />;
+  }
+  
   // Handle plans passed as a structured object
   if (message.type === 'plans') {
-    return Array.isArray(message.content) ? (
+    return (
       <div className="plans-container">
-        {message.content.map((plan, index) => (
+        {Array.isArray(message.content) && message.content.map((plan, index) => (
           <div key={index}>
             <h3 style={{ color: '#2e7d32', marginBottom: '8px' }}>Plan {index + 1}: {plan.concept}</h3>
             <PlanMessage planData={plan} />
           </div>
         ))}
       </div>
-    ) : (
-      <PlanMessage planData={message.content} />
     );
-  }
-  
-  // Handle invitation messages
-  if (message.type === 'invitation') {
-    return <InvitationMessage invitation={message.content} />;
   }
   
   // Handle image messages
@@ -77,24 +75,6 @@ function ChatMessage({ message }) {
       }
     }
     
-    // Check for invitation request or response text
-    if (message.content.toLowerCase().includes('invitation') && 
-        (message.content.includes('generate') || message.content.includes('create'))) {
-      return (
-        <div style={{ 
-          padding: '16px', 
-          backgroundColor: '#fff8e1', 
-          margin: '8px 0', 
-          borderRadius: '8px',
-          border: '1px solid #ffe082',
-          whiteSpace: 'pre-wrap',
-          lineHeight: '1.5'
-        }}
-        dangerouslySetInnerHTML={{ __html: processText(message.content) }} />
-      );
-    }
-    
-    // Default text message
     return <TextMessage content={message.content} />;
   }
   

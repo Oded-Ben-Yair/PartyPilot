@@ -1,50 +1,62 @@
-// Renders the input field and handles sending messages.
 import React, { useState } from 'react';
 
-function InputBar({ onSend }) {
+function InputBar({ onSend, disabled, onStop }) {
   const [input, setInput] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
-    // Send a text message
+    if (!input.trim() || disabled) return;
     onSend({ type: 'text', content: input });
     setInput('');
   };
 
+  const handleStop = () => {
+    if (onStop) onStop();
+  };
+
   return (
-    <form onSubmit={handleSubmit} style={{ 
-      display: 'flex',
-      width: '100%' 
-    }}>
+    <form onSubmit={handleSubmit} className="flex w-full">
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        style={{ 
-          flex: '1', 
-          padding: '10px 12px',
-          fontSize: '1rem',
-          borderRadius: '4px 0 0 4px',
-          border: '1px solid #ccc',
-          borderRight: 'none',
-          outline: 'none'
-        }}
-        placeholder="Type your message..."
+        disabled={disabled}
+        className={`
+          flex-1 
+          px-3 py-2.5 
+          text-base 
+          rounded-l-md 
+          border 
+          border-r-0 
+          border-gray-300 
+          focus:border-blue-500 
+          focus:ring-1 
+          focus:ring-blue-500 
+          ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}
+        `}
+        placeholder={disabled ? "AI is processing..." : "Type your message..."}
       />
       <button 
-        type="submit" 
-        style={{ 
-          padding: '10px 20px',
-          backgroundColor: '#4CAF50',
-          color: 'white',
-          border: 'none',
-          borderRadius: '0 4px 4px 0',
-          fontSize: '1rem',
-          cursor: 'pointer'
-        }}
+        type={disabled ? "button" : "submit"}
+        onClick={disabled ? handleStop : undefined}
+        className={`
+          px-5 py-2.5 
+          text-base 
+          rounded-r-md 
+          text-white 
+          font-medium 
+          transition-colors 
+          duration-200 
+          ${disabled 
+            ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' 
+            : 'bg-green-500 hover:bg-green-600 focus:ring-green-500'}
+          focus:outline-none 
+          focus:ring-2 
+          focus:ring-opacity-50
+          ${disabled ? 'cursor-pointer' : 'cursor-pointer'}
+        `}
       >
-        Send
+        {disabled ? 'Stop' : 'Send'}
       </button>
     </form>
   );
