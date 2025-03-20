@@ -77,10 +77,22 @@ Respond with a JSON object in the following format:
 
   let extractedData;
   try {
-    extractedData = JSON.parse(extractionResponse.choices[0].message.content);
+    extractedData = JSON.parse(extractionResponse.choices[0].message.content.replace(/```json|```/g, '').trim());
   } catch (parseError) {
     console.error('[/api/generate-invitation] Error parsing extraction response:', parseError);
-    throw new Error("Failed to parse extracted conversation data.");
+    // Try a second approach - find the JSON object between curly braces
+    try {
+      const regex = /{[\s\S]*}/;
+      const match = extractionResponse.choices[0].message.content.match(regex);
+      if (match) {
+        extractedData = JSON.parse(match[0]);
+      } else {
+        throw new Error("Could not extract JSON data");
+      }
+    } catch (secondError) {
+      console.error('[/api/generate-invitation] Second parsing attempt failed:', secondError);
+      throw new Error("Failed to parse extracted conversation data.");
+    }
   }
 
   const { name, age, theme } = extractedData;

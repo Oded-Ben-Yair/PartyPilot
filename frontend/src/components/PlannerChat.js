@@ -24,6 +24,20 @@ function PlannerChat() {
     });
   };
 
+  const handleGenerateInvitation = () => {
+    try {
+      setLoading(true);
+      requestInvitation();
+    } catch (err) {
+      // Show user-friendly error
+      addMessage({
+        role: 'assistant',
+        type: 'text',
+        content: "I'm sorry, I couldn't generate the invitation at this time. Would you like to try again or proceed with the current plan?"
+      });
+    }
+  };
+
   // Show welcome screen with options if this is the first message
   if (showWelcome) {
     return (
@@ -54,7 +68,8 @@ function PlannerChat() {
                 borderRadius: '4px',
                 fontSize: '1rem',
                 cursor: 'pointer',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
               }}
             >
               Let's Chat
@@ -69,7 +84,8 @@ function PlannerChat() {
                 borderRadius: '4px',
                 fontSize: '1rem',
                 cursor: 'pointer',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
               }}
             >
               I'm in a Rush
@@ -96,7 +112,7 @@ function PlannerChat() {
         </div>
         
         <button 
-          onClick={requestInvitation} 
+          onClick={handleGenerateInvitation} 
           disabled={loading}
           style={{ 
             padding: '0.5rem 1rem', 
@@ -107,10 +123,12 @@ function PlannerChat() {
             fontSize: '0.9rem',
             cursor: 'pointer',
             fontWeight: 'bold',
-            whiteSpace: 'nowrap'
+            whiteSpace: 'nowrap',
+            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+            transition: 'background-color 0.2s'
           }}
         >
-          Generate Invitation
+          {loading ? 'Generating...' : 'Generate Invitation'}
         </button>
       </div>
     </div>
