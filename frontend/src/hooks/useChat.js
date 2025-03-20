@@ -1,13 +1,15 @@
 // Custom hook to manage chat state and API interactions.
 // Ensures every message includes a role (required by the OpenAI API)
 // and adds an initial greeting only once.
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { sendChatMessage, fetchInvitation } from '../apiService';
 
 export default function useChat() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Add a ref to track if the greeting has been added
+  const greetingAddedRef = useRef(false);
 
   // Adds a new message to the conversation.
   const addMessage = useCallback((message) => {
@@ -16,11 +18,15 @@ export default function useChat() {
 
   // Add an initial greeting message on mount (only once).
   useEffect(() => {
-    addMessage({
-      role: 'assistant',
-      type: 'text',
-      content: 'Hello! I’m your PartyPilot. How can I help plan your birthday today?'
-    });
+    // Only add welcome message if it hasn't been added yet
+    if (!greetingAddedRef.current && messages.length === 0) {
+      greetingAddedRef.current = true;
+      addMessage({
+        role: 'assistant',
+        type: 'text',
+        content: 'Hello! I'm your PartyPilot. How can I help plan your birthday today?'
+      });
+    }
   }, []); // empty dependency array ensures it runs only once
 
   // Sends a new message to the chat API and updates the conversation.
@@ -63,18 +69,22 @@ export default function useChat() {
         type: 'text',
         content: response.invitationText
       });
-      addMessage({
-        role: 'assistant',
-        type: 'image',
-        content: response.imageUrl
-      });
+      
+      // Only add the image if we have a valid URL
+      if (response.imageUrl && response.imageUrl !== "") {
+        addMessage({
+          role: 'assistant',
+          type: 'image',
+          content: response.imageUrl
+        });
+      }
     } catch (err) {
       console.error('[useChat] Error generating invitation:', err);
       setError(err.message);
       addMessage({
         role: 'assistant',
         type: 'text',
-        content: 'Error: Could not generate invitation.'
+        content: 'Error: Could not generate invitation. Please try again later.'
       });
     } finally {
       setLoading(false);
@@ -90,4 +100,3 @@ export default function useChat() {
     requestInvitation,
   };
 }
-
