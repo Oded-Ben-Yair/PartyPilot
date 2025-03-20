@@ -1,10 +1,9 @@
-// ChatBox.js
 // Displays the list of chat messages with auto-scroll functionality.
 // Updated styling for improved responsiveness and UX.
 import React, { useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 
-function ChatBox({ messages }) {
+function ChatBox({ messages, loading }) {
   const containerRef = useRef(null);
 
   // Auto-scroll to the bottom whenever messages change.
@@ -30,8 +29,14 @@ function ChatBox({ messages }) {
       {messages.map((msg, index) => (
         <ChatMessage key={index} message={msg} />
       ))}
+      {loading && (
+        <div style={{ textAlign: 'center', marginTop: '10px', fontStyle: 'italic' }}>
+          <span>Thinking...</span>
+        </div>
+      )}
     </div>
   );
 }
 
 export default ChatBox;
+
