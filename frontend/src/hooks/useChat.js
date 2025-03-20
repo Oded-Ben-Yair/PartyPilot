@@ -24,7 +24,7 @@ export default function useChat() {
       addMessage({
         role: 'assistant',
         type: 'text',
-        content: 'Hello! I'm your PartyPilot. How can I help plan your birthday today?'
+        content: "Hello! I'm your PartyPilot. How can I help plan your birthday today?"
       });
     }
   }, []); // empty dependency array ensures it runs only once
