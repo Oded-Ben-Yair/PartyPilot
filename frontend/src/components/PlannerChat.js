@@ -4,26 +4,18 @@ import InputBar from './InputBar';
 import useChat from '../hooks/useChat';
 
 function PlannerChat() {
-  const { messages, loading, sendMessage, requestInvitation, stopGeneration } = useChat();
+  const { messages, loading, sendMessage, stopGeneration, handleInitialPathSelection } = useChat();
   const [showWelcome, setShowWelcome] = useState(true);
   const [error, setError] = useState(null);
 
   const handleChatOption = () => {
     setShowWelcome(false);
-    sendMessage({ content: "Let's chat about my party!" }); // Start chat
+    handleInitialPathSelection('chat');
   };
 
   const handleQuickFormOption = () => {
     setShowWelcome(false);
-    sendMessage({ content: "I'm in a rush, let's get started quickly!" }); // Start quick planning
-  };
-
-  const handleGenerateInvitation = async () => {
-    try {
-      await requestInvitation();
-    } catch (err) {
-      setError("I'm sorry, I couldn't generate the invitation at this time. Would you like to try again or proceed with the current plan?");
-    }
+    handleInitialPathSelection('quick');
   };
 
   if (showWelcome) {
@@ -60,17 +52,25 @@ function PlannerChat() {
       <div style={{ flex: 1, overflowY: 'auto' }}>
         <ChatBox messages={messages} loading={loading} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem', gap: '0.5rem', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1', minWidth: '200px' }}>
-          <InputBar onSend={sendMessage} />
+      <div style={{ display: 'flex', alignItems: 'center', marginTop: '1rem', gap: '0.5rem' }}>
+        <div style={{ flex: '1' }}>
+          <InputBar onSend={sendMessage} disabled={loading} />
         </div>
-        {loading ? (
-          <button onClick={stopGeneration} style={{ padding: '0.5rem 1rem', fontSize: '1rem', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+        {loading && (
+          <button 
+            onClick={stopGeneration} 
+            style={{ 
+              padding: '0.5rem 1rem', 
+              fontSize: '1rem', 
+              backgroundColor: '#dc3545', 
+              color: 'white', 
+              border: 'none', 
+              borderRadius: '4px', 
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
             Stop Generating
-          </button>
-        ) : (
-          <button onClick={handleGenerateInvitation} style={{ padding: '0.5rem 1rem', fontSize: '1rem', backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-            Generate Invitation
           </button>
         )}
       </div>
