@@ -1,70 +1,84 @@
-# Getting Started with Create React App
+# PartyPilot
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+PartyPilot is an AI-powered birthday planning system built with Node.js, Express, React, and OpenAI that dynamically generates personalized birthday event plans and digital invitations, fully adhering to the PDF assignment requirements.
 
-## Available Scripts
+## Key Features
 
-In the project directory, you can run:
+- **User Input & Quick Form:**  
+  Users can enter details like age, theme, guest count, budget range, location, and preferred activities via an interactive chat or quick form.
 
-### `npm start`
+- **AI-Generated Plans:**  
+  Utilizes advanced prompting techniques (ReAct, Tree-of-Thought, prompt chaining) to produce three distinct birthday event plans, including venue recommendations, activity schedules, catering suggestions, and guest engagement ideas.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Digital Invitation Generation:**  
+  Leverages OpenAI’s DALL-E to create custom digital invitations based on the party theme and user preferences.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Customizable Experience:**  
+  Users can edit and tweak the generated plans directly within the chat interface.
 
-### `npm test`
+## Tech Stack
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Backend:** Node.js, Express
+- **Frontend:** React (bootstrapped with Create React App)
+- **AI Integration:** OpenAI API (ChatGPT and DALL-E)
+- **Configuration:** Environment variables via `.env`
 
-### `npm run build`
+## Prerequisites
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Node.js (LTS recommended)
+- npm
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Setup Instructions
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. **Clone the Repository:**
+   ```bash
+   git clone <YOUR_REPO_URL>
+   cd <REPO_DIRECTORY>
+   ```
 
-### `npm run eject`
+2. **Configure Environment Variables:**
+   - In the `server` directory, create a `.env` file with the following:
+     ```env
+     OPENAI_API_KEY=your_openai_api_key_here
+     ```
+     
+3. **Install Dependencies:**
+   - For the backend:
+     ```bash
+     cd server
+     npm install
+     ```
+   - For the frontend:
+     ```bash
+     cd ../frontend
+     npm install
+     ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Running the Application
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Start the Backend Server (Port 3001):**
+  ```bash
+  cd server
+  npm start
+  ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- **Start the Frontend App (Port 3000):**
+  ```bash
+  cd frontend
+  npm start
+  ```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## API Endpoints
 
-## Learn More
+- **Chat Endpoint:**  
+  `POST /api/chat` - Generates AI-powered birthday event plans.
+  
+- **Invitation Generation Endpoint:**  
+  `POST /api/generate-invitation` - Creates a digital invitation using DALL-E based on conversation context.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Deployment
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Follow the standard Create React App deployment guidelines for the frontend and deploy the Node.js backend using your preferred method.
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
