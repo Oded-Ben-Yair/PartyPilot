@@ -1,4 +1,6 @@
+// InvitationMessage.js
 import React, { useState } from 'react';
+import './InvitationMessage.css'; // Import the CSS file
 
 function InvitationMessage({ sendMessage, invitation }) {
   // Always call hooks at the top level
@@ -18,14 +20,14 @@ function InvitationMessage({ sendMessage, invitation }) {
   // If we already have an invitation response, render it
   if (invitation) {
     return (
-      <div className="w-full max-w-lg mx-auto p-4 border rounded-lg bg-white shadow">
-        <h3 className="text-lg font-bold mb-2">Your Digital Invitation</h3>
+      <div className="invitation-card">
+        <h3 className="invitation-title">Your Digital Invitation</h3>
         <p>{invitation.text}</p>
         {invitation.imageUrl && (
           <img
             src={invitation.imageUrl}
             alt="Digital Invitation"
-            className="mt-4 rounded"
+            className="invitation-image"
           />
         )}
       </div>
@@ -34,18 +36,16 @@ function InvitationMessage({ sendMessage, invitation }) {
 
   // Otherwise, render the invitation input form
   return (
-    <div className="w-full max-w-lg mx-auto p-4">
+    <div className="invitation-form-container">
       <textarea
         value={invitationPrompt}
         onChange={(e) => setInvitationPrompt(e.target.value)}
         placeholder="Describe the invitation you want (theme, style, details)"
-        className="w-full p-3 border rounded-lg mb-3 resize-y min-h-[100px] 
-                   focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        className="invitation-textarea"
       />
       <button
         onClick={handleSubmit}
-        className="w-full bg-blue-500 text-white py-2 rounded-lg 
-                   hover:bg-blue-600 transition-colors"
+        className="invitation-button"
       >
         Generate Invitation
       </button>
@@ -54,4 +54,3 @@ function InvitationMessage({ sendMessage, invitation }) {
 }
 
 export default InvitationMessage;
-

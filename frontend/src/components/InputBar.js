@@ -1,5 +1,6 @@
 // InputBar.js
 import React, { useState, useRef, useEffect } from 'react';
+import './InputBar.css'; // Import the CSS file
 
 function InputBar({ onSend, disabled, onStop }) {
   const [input, setInput] = useState('');
@@ -23,8 +24,8 @@ function InputBar({ onSend, disabled, onStop }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full p-4 bg-gray-100 border-t">
-      <div className="relative">
+    <form onSubmit={handleSubmit} className="input-bar-form">
+      <div className="input-bar-container">
         <textarea
           ref={textareaRef}
           value={input}
@@ -32,22 +33,22 @@ function InputBar({ onSend, disabled, onStop }) {
           disabled={disabled}
           rows={1}
           style={{ resize: 'none' }}
-          className="w-full p-3 pr-12 border rounded-lg overflow-hidden focus:ring-2 focus:ring-blue-500"
+          className="input-textarea"
           placeholder={disabled ? "AI is processing..." : "Type your message..."}
         />
-        <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ width: '80px' }}>
+        <div className="button-container">
           {disabled ? (
             <button 
               type="button"
               onClick={onStop}
-              className="w-full bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+              className="stop-button"
             >
               Stop
             </button>
           ) : (
             <button 
               type="submit"
-              className="w-full bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+              className="send-button"
             >
               Send
             </button>
@@ -59,4 +60,3 @@ function InputBar({ onSend, disabled, onStop }) {
 }
 
 export default InputBar;
-

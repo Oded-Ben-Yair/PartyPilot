@@ -1,0 +1,63 @@
+/* InvitationMessage.css */
+.invitation-card {
+    width: 100%;
+    max-width: 32rem; /* 512px */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+  
+  .invitation-title {
+    font-size: 1.125rem; /* 18px */
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  
+  .invitation-image {
+    margin-top: 16px;
+    border-radius: 4px;
+  }
+  
+  .invitation-form-container {
+    width: 100%;
+    max-width: 32rem; /* 512px */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 16px;
+  }
+  
+  .invitation-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    resize: vertical;
+    min-height: 100px;
+    box-sizing: border-box;
+  }
+  
+  .invitation-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+  
+  .invitation-button {
+    width: 100%;
+    background-color: #3b82f6;
+    color: white;
+    padding: 8px 0;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .invitation-button:hover {
+    background-color: #2563eb;
+  }
