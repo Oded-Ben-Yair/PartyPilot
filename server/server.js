@@ -1,26 +1,64 @@
-// This file sets up the Express server for the PartyPilot project.
-// It initializes middleware, configures environment variables, and sets up a basic health-check endpoint.
+// server.js
+// This file sets up the Express server and routes for the PartyPilot project.
+// It delegates OpenAI API interactions to functions defined in service.js.
 
-const express = require('express'); // Import the Express framework
-const cors = require('cors');         // Import CORS middleware for enabling cross-origin requests
-require('dotenv').config();           // Load environment variables from .env file
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
 
-// Create an instance of the Express application
+const { getChatResponse, generateInvitation } = require('./service');
+
 const app = express();
 
-// Middleware configuration
-app.use(cors());                    // Enable Cross-Origin Resource Sharing for all routes
-app.use(express.json());            // Automatically parse JSON in incoming requests
+// Middleware setup
+app.use(cors());
+app.use(express.json());
 
-// Health-check endpoint to verify server status
+// Health-check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'online' });
 });
 
-// Retrieve port number from environment variables or default to 3001
-const PORT = process.env.PORT || 3001;
+// Chat endpoint: handles general conversation for planning birthday events
+app.post('/api/chat', async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!messages) {
+      return res.status(400).json({ error: 'No messages provided' });
+    }
+    // Call the service function to get a chat response
+    const result = await getChatResponse(messages);
+    res.json(result);
+  } catch (error) {
+    console.error('[/api/chat] Error:', error);
+    res.status(500).json({
+      error: 'Failed to get chat response',
+      message: 'There was an error processing your request. Please try again later.'
+    });
+  }
+});
 
-// Start the server and log the running port
+// Invitation endpoint: generates a digital invitation based on conversation context
+app.post('/api/generate-invitation', async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!messages) {
+      return res.status(400).json({ error: 'No messages provided' });
+    }
+    // Call the service function to generate an invitation
+    const invitationData = await generateInvitation(messages);
+    res.json(invitationData);
+  } catch (error) {
+    console.error('[/api/generate-invitation] Error:', error);
+    res.status(500).json({
+      error: 'Failed to generate invitation',
+      message: 'There was an error processing your invitation. Please try again later.'
+    });
+  }
+});
+
+// Start the server on the configured port
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
