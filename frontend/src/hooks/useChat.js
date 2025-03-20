@@ -1,6 +1,3 @@
-// Custom hook to manage chat state and API interactions.
-// Ensures every message includes a role (required by the OpenAI API)
-// and adds an initial greeting only once.
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { sendChatMessage, fetchInvitation } from '../apiService';
 
@@ -8,17 +5,14 @@ export default function useChat() {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // Add a ref to track if the greeting has been added
+  const [controller, setController] = useState(null);
   const greetingAddedRef = useRef(false);
 
-  // Adds a new message to the conversation.
   const addMessage = useCallback((message) => {
     setMessages((prev) => [...prev, message]);
   }, []);
 
-  // Add an initial greeting message on mount (only once).
   useEffect(() => {
-    // Only add welcome message if it hasn't been added yet
     if (!greetingAddedRef.current && messages.length === 0) {
       greetingAddedRef.current = true;
       addMessage({
@@ -27,76 +21,63 @@ export default function useChat() {
         content: "Hello! I'm your PartyPilot. How can I help plan your birthday today?"
       });
     }
-  }, []); // empty dependency array ensures it runs only once
-
-  // Sends a new message to the chat API and updates the conversation.
-  const sendMessage = useCallback(async (newMessage) => {
-    // Ensure the new message has a role of 'user'
-    const userMessage = { role: 'user', ...newMessage };
-    try {
-      setLoading(true);
-      addMessage(userMessage); // Add the user message
-      const response = await sendChatMessage([...messages, userMessage]);
-      // Parse the response from the API.
-      const replyContent = response.response || JSON.stringify(response);
-      // Add the assistant response with the proper role.
-      addMessage({
-        role: 'assistant',
-        type: 'text',
-        content: replyContent
-      });
-    } catch (err) {
-      console.error('[useChat] Error sending message:', err);
-      setError(err.message);
-      addMessage({
-        role: 'assistant',
-        type: 'text',
-        content: 'Error: Could not send message.'
-      });
-    } finally {
-      setLoading(false);
-    }
   }, [messages, addMessage]);
 
-  // Requests a digital invitation based on the current conversation.
-  const requestInvitation = useCallback(async () => {
+  const sendMessage = useCallback(async (newMessage) => {
+    const userMessage = { role: 'user', ...newMessage };
+    const newController = new AbortController();
+    setController(newController);
+    setLoading(true);
+    addMessage(userMessage);
     try {
-      setLoading(true);
-      const response = await fetchInvitation(messages);
-      // Append invitation text and image with proper roles.
-      addMessage({
-        role: 'assistant',
-        type: 'text',
-        content: response.invitationText
-      });
-      
-      // Only add the image if we have a valid URL
-      if (response.imageUrl && response.imageUrl !== "") {
-        addMessage({
-          role: 'assistant',
-          type: 'image',
-          content: response.imageUrl
-        });
+      const response = await sendChatMessage([...messages, userMessage], newController.signal);
+      if (response.aborted) return addMessage({ role: 'assistant', type: 'text', content: 'Generation stopped.' });
+      if (response.plans) {
+        const plansText = response.plans.map((plan, i) => 
+          `**Plan ${i + 1}: ${plan.concept}**\n- Theme: ${plan.theme}\n- Venue: ${plan.venue}\n- Activities: ${plan.activities.map(a => `${a.time} - ${a.activity}`).join(', ')}\n- Catering: ${plan.catering}\n- Guest Experience: ${plan.guestExperience}\n- Budget: ${plan.budget}`
+        ).join('\n\n');
+        addMessage({ role: 'assistant', type: 'text', content: plansText });
+      } else {
+        addMessage({ role: 'assistant', type: 'text', content: response.response || JSON.stringify(response) });
       }
     } catch (err) {
-      console.error('[useChat] Error generating invitation:', err);
-      setError(err.message);
-      addMessage({
-        role: 'assistant',
-        type: 'text',
-        content: 'Error: Could not generate invitation. Please try again later.'
-      });
+      if (err.name === 'AbortError') addMessage({ role: 'assistant', type: 'text', content: 'Generation stopped.' });
+      else {
+        console.error('[useChat] Error:', err);
+        setError(err.message);
+        addMessage({ role: 'assistant', type: 'text', content: 'Error: Could not send message.' });
+      }
     } finally {
       setLoading(false);
+      setController(null);
     }
   }, [messages, addMessage]);
 
-  return {
-    messages,
-    loading,
-    error,
-    sendMessage,
-    addMessage,
-    requestInvitation,
-  };
+  const requestInvitation = useCallback(async () => {
+    const newController = new AbortController();
+    setController(newController);
+    setLoading(true);
+    try {
+      const response = await fetchInvitation(messages, newController.signal);
+      if (response.aborted) return addMessage({ role: 'assistant', type: 'text', content: 'Invitation generation stopped.' });
+      addMessage({ role: 'assistant', type: 'text', content: response.invitationText });
+      if (response.imageUrl && response.imageUrl !== "") addMessage({ role: 'assistant', type: 'image', content: response.imageUrl });
+    } catch (err) {
+      if (err.name === 'AbortError') addMessage({ role: 'assistant', type: 'text', content: 'Invitation generation stopped.' });
+      else {
+        console.error('[useChat] Error:', err);
+        setError(err.message);
+        addMessage({ role: 'assistant', type: 'text', content: 'Error: Could not generate invitation.' });
+      }
+    } finally {
+      setLoading(false);
+      setController(null);
+    }
+  }, [messages, addMessage]);
+
+  const stopGeneration = useCallback(() => {
+    if (controller) controller.abort();
+  }, [controller]);
+
+  return { messages, loading, error, sendMessage, addMessage, requestInvitation, stopGeneration };
 }
