@@ -1,22 +1,18 @@
 // Container component for the PartyPilot chat interface.
-// It combines the ChatBox and InputBar components.
-import React, { useState } from 'react';
+// Utilizes the custom hook useChat for state management and API integration.
+import React from 'react';
 import ChatBox from './ChatBox';
 import InputBar from './InputBar';
+import useChat from '../hooks/useChat';
 
 function PlannerChat() {
-  // messages: an array of message objects { type: string, content: string or object }
-  const [messages, setMessages] = useState([]);
-
-  // Adds a new message to the conversation
-  const addMessage = (message) => {
-    setMessages(prev => [...prev, message]);
-  };
+  // Destructure state and functions from useChat
+  const { messages, loading, sendMessage } = useChat();
 
   return (
     <div>
-      <ChatBox messages={messages} />
-      <InputBar onSend={addMessage} />
+      <ChatBox messages={messages} loading={loading} />
+      <InputBar onSend={sendMessage} />
     </div>
   );
 }
