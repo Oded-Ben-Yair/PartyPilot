@@ -2,6 +2,7 @@
 
 PartyPilot is an AI-powered birthday planning system built with Node.js, Express, React, and OpenAI that dynamically generates personalized birthday event plans and digital invitations, fully adhering to the PDF assignment requirements.
 
+
 ## Key Features
 
 - **User Input & Quick Form:**  
@@ -80,4 +81,4 @@ PartyPilot is an AI-powered birthday planning system built with Node.js, Express
 
 Follow the standard Create React App deployment guidelines for the frontend and deploy the Node.js backend using your preferred method.
 
-
+[Screencast From 2025-03-23 11-40-50.webm](https://github.com/user-attachments/assets/7c6179d4-6eee-4dd6-a37c-f6410cc29387)
